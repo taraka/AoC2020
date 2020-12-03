@@ -17,7 +17,7 @@ fn check_slopes(forest: &str, slopes: Vec<(usize, usize)>) -> u64 {
 
 fn num_trees(forest: &str, x_step: usize, y_step: usize) -> u64 {
 	forest.lines().enumerate()
-	.filter(|(y,_)| y % y_step == 0 )
+	.step_by(y_step)
 	.filter(|(y, row)| 
 		row.chars().nth(((y/y_step) * x_step) % row.chars().count()).unwrap() == '#' 
 	).count() as u64
