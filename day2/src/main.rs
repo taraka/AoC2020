@@ -4,7 +4,8 @@ use lazy_static::lazy_static;
 
 #[derive(Debug)]
 struct Password {
-    range: std::ops::Range<u32>,
+    low: usize,
+    high: usize,
     c: char,
     password: String
 }
@@ -19,7 +20,8 @@ impl Password {
         
         RE.captures(s).map(|caps|
             Password {
-                range: (u32::from_str_radix(&caps["low"], 10).unwrap())..(u32::from_str_radix(&caps["high"], 10).unwrap()+1),
+                low: usize::from_str_radix(&caps["low"], 10).unwrap() - 1,
+                high: usize::from_str_radix(&caps["high"], 10).unwrap() - 1,
                 c: caps["c"].chars().nth(0).unwrap(),
                 password: caps["password"].to_owned()
             })
@@ -27,8 +29,7 @@ impl Password {
     }
 
     fn is_valid(&self) -> bool {
-        let n = self.password.chars().filter(|v| v == &self.c).count() as u32;
-        self.range.contains(&n)
+        (self.password.chars().nth(self.low).unwrap() == self.c) ^ (self.password.chars().nth(self.high).unwrap() == self.c)
     }
 }
 
@@ -64,6 +65,6 @@ mod tests {
 2-9 c: ccccccccc
         "#;
 
-        assert_eq!(num_valid(input), 2);
+        assert_eq!(num_valid(input), 1);
     }
 }
