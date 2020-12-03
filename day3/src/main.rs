@@ -11,16 +11,9 @@ fn main() -> io::Result<()> {
 }
 
 fn num_trees(forest: &str) -> u32 {
-	let mut count = 0;
-	let mut y = 0;
-	for row in forest.lines() {
-		let x = (y * 3) % row.chars().count();
-		if row.chars().nth(x).unwrap() == '#' {
-			count += 1;
-		}
-		y += 1;
-	}
-	count
+	forest.lines().enumerate().filter(|(y, row)| 
+		row.chars().nth((y * 3) % row.chars().count()).unwrap() == '#' 
+	).count() as u32
 }
 
 #[cfg(test)]
