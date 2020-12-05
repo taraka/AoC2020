@@ -5,8 +5,18 @@ fn main() -> io::Result<()> {
     io::stdin().read_to_string(&mut buffer)?;
 
     let max = buffer.lines().into_iter().filter_map(seat_id).max();
-
     println!("Max ID is: {}", max.unwrap());
+
+    let mut seats: Vec<u64> = buffer.lines().into_iter().filter_map(seat_id).collect();
+	seats.sort();
+    
+    let mut prev: &u64 = &0;
+	for id in seats.iter() {
+		if id - prev == 2 {
+			println!("ID: {}", id-1);
+		}
+		prev = id;
+	} 
 
     Ok(())
 }
