@@ -21,20 +21,9 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn get_number(s: &str, high: char, _low: char) -> Option<u64> {
-	u64::from_str_radix(&s.chars().map(|c| if c == high {'1'} else {'0'}).collect::<String>(), 2).ok()
-}
-
-fn row_num (s: &str) -> Option<u64> {
-	get_number(s, 'B', 'F')
-}
-
-fn col_num (s: &str) -> Option<u64> {
-	get_number(s, 'R', 'L')
-}
 
 fn seat_id(seat: &str) -> Option<u64> {
-	Some(row_num(&seat[..7])? * 8 + col_num(&seat[7..])?)
+	u64::from_str_radix(&seat.chars().map(|c| if vec!['R', 'B'].contains(&c) {'1'} else {'0'}).collect::<String>(), 2).ok()
 }
 
 
