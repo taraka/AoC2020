@@ -39,18 +39,17 @@ fn parse_group(g: &str) -> Group {
 fn parse_person(p: &str) -> Person {
     p.chars()
         .filter(char::is_ascii_lowercase)
-        .collect::<Person>()
+        .collect()
             
 }
 
 fn count_everyone_group(group: Group) -> u64 {
     (b'a' ..= b'z')
         .map(char::from)
-        .map(|c| (c, group.iter().map(|p| if p.contains(&c) {1} else {0} ).sum::<u64>() as usize))
+        .map(|c| (c, group.iter().filter(|p| p.contains(&c)).count()))
         .filter(|(_c, n)| n == &group.len())
         .map(|(c, _n)| c)
-        .collect::<Vec<char>>()
-        .len() as u64
+        .count() as u64
 }
 
 #[cfg(test)]
