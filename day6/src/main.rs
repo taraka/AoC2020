@@ -25,8 +25,6 @@ fn sum_counts(data: &str) -> u64 {
 fn count_everyone(data: &str) -> u64 {
     data.split("\n\n")
         .map(parse_group)
-        .collect::<Vec<Group>>()
-        .iter()
         .map(count_everyone_group)
         .sum()
 }
@@ -45,7 +43,7 @@ fn parse_person(p: &str) -> Person {
             
 }
 
-fn count_everyone_group(group: &Group) -> u64 {
+fn count_everyone_group(group: Group) -> u64 {
     (b'a' ..= b'z')
         .map(char::from)
         .map(|c| (c, group.iter().map(|p| if p.contains(&c) {1} else {0} ).sum::<u64>() as usize))
