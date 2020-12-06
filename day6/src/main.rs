@@ -1,10 +1,8 @@
-#![feature(str_split_once)]
+use std::io::{self, Read};
+use std::collections::HashSet;
 
 type Person = HashSet<char>;
 type Group = Vec<Person>;
-
-use std::io::{self, Read};
-use std::collections::HashSet;
 
 fn main() -> io::Result<()> {
     let mut buffer = String::new();
