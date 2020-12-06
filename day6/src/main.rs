@@ -12,6 +12,9 @@ fn main() -> io::Result<()> {
     let n = count_orbits(&buffer);
     println!("Found {} orbits", n);
 
+    let d = find_route(&buffer);
+    println!("Distance is {}", d);
+
     Ok(())
 }
 
@@ -21,17 +24,27 @@ fn build_map(data: &str) -> OrbitMap {
 
 fn count_orbits(data: &str) -> u64 {
 	let map = build_map(data);
-	map.keys().map(|obj| count_orbits_for_obj(&map, obj)).sum()
+	map.keys().map(|obj| find_parents(&map, obj).len() as u64).sum()
 }
 
-fn count_orbits_for_obj(map: &OrbitMap, obj: &str) -> u64 {
+fn find_route(data: &str) -> u64 {
+	let map = build_map(data);
+	let you = find_parents(&map, "YOU");
+	let san = find_parents(&map, "SAN");
+	let common: Vec<&str> = you.iter().filter(|y| san.contains(y)).copied().collect();
+
+	(you.len() + san.len() - (common.len() * 2) - 2) as u64
+}
+
+fn find_parents<'a>(map: &'a OrbitMap, obj: &'a str) -> Vec<&'a str> {
 	if obj == "COM" {
-		return 0;
+		return Vec::new();
 	}
 
-	count_orbits_for_obj(map, map.get(obj).unwrap()	) + 1
+	let mut parents = find_parents(map, map.get(obj).unwrap());
+	parents.push(obj);
+	parents
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -52,5 +65,25 @@ J)K
 K)L"#;
         assert_eq!(count_orbits(input), 42);
 
+    }
+
+
+    #[test]
+    fn part2() {
+    	let input = r"COM)B
+B)C
+C)D
+D)E
+E)F
+B)G
+G)H
+D)I
+E)J
+J)K
+K)L
+K)YOU
+I)SAN";
+
+	assert_eq!(find_route(input), 4);
     }
 }
