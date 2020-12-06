@@ -15,44 +15,44 @@ fn main() -> io::Result<()> {
 }
 
 fn sum_counts(data: &str) -> u64 {
-	data.split("\n\n")
-		.map(|g| g.chars()
-					.filter(|c| c.is_ascii_lowercase())
-		.collect::<Person>().len() as u64)
-		.sum()
+    data.split("\n\n")
+        .map(|g| g.chars()
+                    .filter(|c| c.is_ascii_lowercase())
+        .collect::<Person>().len() as u64)
+        .sum()
 }
 
 fn count_everyone(data: &str) -> u64 {
-	data.split("\n\n")
-		.map(parse_group)
-		.collect::<Vec<Group>>()
-		.iter()
-		.map(count_everyone_group)
-		.sum()
+    data.split("\n\n")
+        .map(parse_group)
+        .collect::<Vec<Group>>()
+        .iter()
+        .map(count_everyone_group)
+        .sum()
 }
 
 fn parse_group(g: &str) -> Group {
-	g.split('\n')
-		.map(parse_person)
-		.filter(|g| !g.is_empty())
-		.collect()
+    g.split('\n')
+        .map(parse_person)
+        .filter(|g| !g.is_empty())
+        .collect()
 }
 
 fn parse_person(p: &str) -> Person {
-	p.chars()
-		.filter(char::is_ascii_lowercase)
-		.collect::<Person>()
-			
+    p.chars()
+        .filter(char::is_ascii_lowercase)
+        .collect::<Person>()
+            
 }
 
 fn count_everyone_group(group: &Group) -> u64 {
-	(b'a' ..= b'z')
-		.map(char::from)
-		.map(|c| (c, group.iter().map(|p| if p.contains(&c) {1} else {0} ).sum::<u64>() as usize))
-		.filter(|(_c, n)| n == &group.len())
-		.map(|(c, _n)| c)
-		.collect::<Vec<char>>()
-		.len() as u64
+    (b'a' ..= b'z')
+        .map(char::from)
+        .map(|c| (c, group.iter().map(|p| if p.contains(&c) {1} else {0} ).sum::<u64>() as usize))
+        .filter(|(_c, n)| n == &group.len())
+        .map(|(c, _n)| c)
+        .collect::<Vec<char>>()
+        .len() as u64
 }
 
 #[cfg(test)]
