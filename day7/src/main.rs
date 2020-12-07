@@ -14,6 +14,9 @@ fn main() -> io::Result<()> {
     let n = count_eventually_contains(&buffer,"shiny gold");
     println!("Found {} bags", n);
 
+    let n = how_many_bags_in_a(&buffer, "shiny gold");
+    println!("Part 2: {}", n);
+
     Ok(())
 }
 
@@ -55,6 +58,21 @@ fn count_eventually_contains_rec<'a>(rules: &'a HashMap<Bag, Holds>, obj: Bag<'a
     return set;
 }
 
+
+fn how_many_bags_in_a(input: &str, obj: &str) -> u64 {
+    let rules = build_rules(input);
+    
+    how_many_bags_in_a_rec(&rules, obj) - 1
+}
+
+
+fn how_many_bags_in_a_rec<'a>(rules: &'a HashMap<Bag, Holds>, obj: Bag<'a>) -> u64{
+    rules.get(obj).unwrap_or(&vec![]).iter()
+        .map(|(n , b)| (n, how_many_bags_in_a_rec(rules, b)))
+        .map(|(n, v)| n * v)
+        .sum::<u64>() + 1
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -76,5 +94,21 @@ dotted black bags contain no other bags."#;
 
     }
 
+    #[test]
+    fn part2() {
+        let input = r#"light red bags contain 1 bright white bag, 2 muted yellow bags.
+dark orange bags contain 3 bright white bags, 4 muted yellow bags.
+bright white bags contain 1 shiny gold bag.
+muted yellow bags contain 2 shiny gold bags, 9 faded blue bags.
+shiny gold bags contain 1 dark olive bag, 2 vibrant plum bags.
+dark olive bags contain 3 faded blue bags, 4 dotted black bags.
+vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.
+faded blue bags contain no other bags.
+dotted black bags contain no other bags."#;
+
+
+        assert_eq!(how_many_bags_in_a(input, "shiny gold"), 32);
+
+    }
 
 }
