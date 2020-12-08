@@ -41,15 +41,14 @@ fn parse_bag(line: &str) -> Bag {
 
 fn count_eventually_contains(input: &str, obj: &str) -> u64 {
 	let rules = build_rules(input);
-    
     (count_eventually_contains_rec(&rules, obj).len() - 1) as u64
 }
 
 fn count_eventually_contains_rec<'a>(rules: &'a HashMap<Bag, Holds>, obj: Bag<'a>) -> HashSet<Bag<'a>> {
     let mut set: HashSet<Bag> = rules.iter()
         .filter(|(_b, r)| r.iter()
-                            .map(|t| t.1)
-                            .any(|b| b == obj))
+                        .map(|t| t.1)
+                        .any(|b| b == obj))
         .flat_map(|(b, _r)| count_eventually_contains_rec(rules, b))
         .collect();
 
