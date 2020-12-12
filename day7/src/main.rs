@@ -57,13 +57,10 @@ fn count_eventually_contains_rec<'a>(rules: &'a HashMap<Bag, Holds>, obj: Bag<'a
     return set;
 }
 
-
 fn how_many_bags_in_a(input: &str, obj: &str) -> u64 {
     let rules = build_rules(input);
-    
     how_many_bags_in_a_rec(&rules, obj) - 1
 }
-
 
 fn how_many_bags_in_a_rec<'a>(rules: &'a HashMap<Bag, Holds>, obj: Bag<'a>) -> u64{
     rules.get(obj).unwrap_or(&vec![]).iter()
