@@ -24,43 +24,43 @@ enum Dir {
 #[derive(Debug)]
 struct Ship {
     n: i64,
-    w: i64,
-    facing: i64
+    e: i64,
+    wn: i64,
+    we: i64
 }
 
 impl Ship {
 	fn new() -> Self {
-		Self {
-			n: 0,
-			w: 0,
-			facing: 0
-		}
+		Self { n: 0, e: 0, wn: 1, we: 10 }
 	}
 
 	fn nav(self, dir: &Dir, value: i64) -> Self {
 		match dir {
-			Dir::North => Ship { n: self.n + value, w: self.w, facing: self.facing },
-			Dir::South => Ship { n: self.n - value, w: self.w, facing: self.facing },
-			Dir::East => Ship { n: self.n, w: self.w - value, facing: self.facing },
-			Dir::West => Ship { n: self.n, w: self.w + value, facing: self.facing },
-			Dir::Forward => { 
-				let dir = get_dir(self.facing);
-				self.nav(&dir, value)
-			},
-			Dir::Right => Ship { n: self.n, w: self.w, facing: (self.facing + value) % 360},
-			Dir::Left => Ship { n: self.n, w: self.w, facing: (self.facing - value + 360) % 360},
+			Dir::North => Ship { n: self.n, e: self.e, wn: self.wn + value, we: self.we },
+			Dir::South => Ship { n: self.n, e: self.e, wn: self.wn - value, we: self.we },
+			Dir::East => Ship { n: self.n, e: self.e, wn: self.wn, we: self.we + value },
+			Dir::West => Ship { n: self.n, e: self.e, wn: self.wn, we: self.we - value },
+			Dir::Forward => Ship { n: self.n + (self.wn * value), e: self.e + (self.we * value), wn: self.wn, we: self.we },
+			Dir::Right => rotate_waypoint(self, get_rotation(dir, value)),
+			Dir::Left => rotate_waypoint(self, get_rotation(dir, value)),
 		}
 	}
 }
 
-fn get_dir(facing: i64) -> Dir {
+fn rotate_waypoint(ship: Ship, rot: i64) -> Ship {
+	match rot {
+		90 => Ship {n: ship.n, e: ship.e, wn: 0 - ship.we, we: ship.wn},
+		180 => Ship {n: ship.n, e: ship.e, wn: 0 - ship.wn,  we:  0 - ship.we},
+		270 => Ship {n: ship.n, e: ship.e, wn: ship.we, we: 0 - ship.wn},
+		_ => panic!("Don't know how to do that")
+	}
+}
 
-	match facing {
-		0 => Dir::East,
-		90 => Dir::South,
-		180 => Dir::West,
-		270 => Dir::North,
-		_ => panic!("We shouldn't be pointing this way, {}", facing)
+fn get_rotation(dir: &Dir, value: i64) -> i64 {
+	match dir {
+		Dir::Left => 360 - value,
+		Dir::Right => value,
+		_ => panic!("Woops")
 	}
 }
 
@@ -76,21 +76,20 @@ fn parse_input(input: &str) -> Vec<(Dir, i64)> {
 			'F' => Dir::Forward,
 			_ => panic!("Unknown direction")
 		}
-	, i64::from_str_radix(&l[1..], 10).unwrap() ))
+	, i64::from_str_radix(&l[1..], 10).unwrap()) )
 	.collect()
 }
 
 fn get_distance(ship: Ship) -> i64 {
-	ship.w.abs() + ship.n.abs()
+	ship.e.abs() + ship.n.abs()
 }
 
 fn part1(input: &str) -> i64 {
 	let instructions = parse_input(input);
 	let ship = instructions.iter().fold(Ship::new(), |s, (d, v)| s.nav(d, *v));
-
+	println!("{:?}", ship);
 	get_distance(ship)
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -103,6 +102,19 @@ N3
 F7
 R90
 F11"#;
-	assert_eq!(part1(input), 25);
+	assert_eq!(part1(input), 286);
+	}
+
+
+	#[test]
+	fn test_part1_l() {
+		let input = r#"F10
+N3
+F7
+L270
+F11"#;
+	assert_eq!(part1(input), 286);
 	}
 }
+
+//Not 27525
