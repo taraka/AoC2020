@@ -6,7 +6,7 @@ fn main() {
                     .collect();
 
         println!("Part1: {}", part1(earliest, buses.iter().filter_map(|v| *v).collect() ));
-        println!("Part2: {}", part2(buses));
+        println!("Part2: {}", part2(buses, 100000000000000));
 }
 
 fn part1(earliest: u64, buses: Vec<u64>) -> u64 {
@@ -20,18 +20,20 @@ fn part1(earliest: u64, buses: Vec<u64>) -> u64 {
     }
 }
 
-fn part2(buses: Vec<Option<u64>>) -> u64 {
-    let mut t = 0; 
-    let bs: Vec<(u64, u64)> = buses.iter().enumerate().filter_map(|(to, b)| Some((to as u64, (*b)?))).collect();
-    let first = buses.iter().nth(0).unwrap().unwrap();
-    while !bs.iter().all(|(to, b)| (t + *to) % b == 0) {
-        if t % 10000 * first == 0 {
-            print!("Working on {}\r", t);
-        }
-        t += first;
-    }
-
-    t
+fn part2(buses: Vec<Option<u64>>, start: u64) -> u64 {
+    buses.iter().enumerate().filter_map(|(to, b)| Some(((*b)?, to as u64)))
+        .fold(
+            (start, 1),
+            |(base_timestamp, period), (bus_id, offset)|
+                (0..).find_map(|i| {
+                    let timestamp = base_timestamp + i * period;
+                    if (timestamp + offset) % bus_id == 0 {
+                        Some( (timestamp, period * bus_id) )
+                    } else {
+                        None
+                    }
+                }).unwrap()
+        ).0
 }
 
 
