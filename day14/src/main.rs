@@ -30,15 +30,11 @@ fn part1(input: &str) -> u64 {
 		match parse_line(line) {
 			Instruction::Mask(m)  => mask = m,
 			Instruction::Mem(m) => {
-				println!("Mask: ({:b}, {:b})\nmem[{}] = {}\n{}\n\n", mask.0, mask.1, m.0, m.1, (m.1 | mask.0) & mask.1);
-				mem.insert(m.0, m.1 | mask.0 & mask.1);
+				mem.insert(m.0, (m.1 | mask.0) & mask.1);
 			},
 		};
-
 	}
 
-
-	println!("{:#?}", mem);
 	mem.values().sum()
 }
 
