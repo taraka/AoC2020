@@ -1,9 +1,10 @@
 #![feature(str_split_once)]
+#![feature(int_bits_const)]
 
 use std::io::{self, Read};
 use std::collections::HashMap;
 
-type Mask = (u64, u64); //(1s, 0s)
+type Mask = (u64, u64); //(1s, floating)
 type MemIns = (u64, u64); //(index, value)
 
 enum Instruction {
@@ -30,7 +31,9 @@ fn part1(input: &str) -> u64 {
 		match parse_line(line) {
 			Instruction::Mask(m)  => mask = m,
 			Instruction::Mem(m) => {
-				mem.insert(m.0, (m.1 | mask.0) & mask.1);
+				for addr in apply_mask(m.0, mask) {
+					mem.insert(addr, m.1);
+				}
 			},
 		};
 	}
@@ -42,11 +45,11 @@ fn parse_line(line: &str) -> Instruction {
 	let (cmd, val) = line.split_once(" = ").unwrap();
 
 	if cmd == "mask" {
-		let mask = val.chars().rev().enumerate().fold((0, u64::MAX), |(ones, zeros), (i, bit)| 
+		let mask = val.chars().rev().enumerate().fold((0, 0), |(ones, floating), (i, bit)| 
 			match bit {
-				'1' => (ones + (1<<i) , zeros),
-				'0' => (ones, zeros - (1<<i)),
-				_ => (ones, zeros)
+				'1' => (ones + (1<<i), floating),
+				'X' => (ones, floating + (1<<i)),
+				_ => (ones, floating)
 			});
 		return Instruction::Mask(mask);
 	}
@@ -57,6 +60,16 @@ fn parse_line(line: &str) -> Instruction {
 		u64::from_str_radix(val, 10).unwrap()))
 }
 
+fn apply_mask(addr: u64, mask: Mask) -> Vec<u64> {
+	apply_mask_rec(vec![addr | mask.0], mask.1)
+}
+
+fn apply_mask_rec(addrs: Vec<u64>, mask: u64) -> Vec<u64> {
+	match (0..u64::BITS).filter(|i| (1<<i) & mask != 0).nth(0) {
+		Some(i) => apply_mask_rec(addrs.iter().flat_map(|a|vec![a | (1<<i), a & (!(1<<i))]).collect(), mask & (!(1<<i))),
+		None => addrs
+	}
+}
 
 #[cfg(test)]
 mod tests {
@@ -64,16 +77,13 @@ mod tests {
 
 	#[test]
     fn test_part1() {
-        let input = r#"mask = XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X
-mem[8] = 11
-mem[7] = 101
-mem[8] = 0"#;
+        let input = r#"mask = 000000000000000000000000000000X1001X
+mem[42] = 100
+mask = 00000000000000000000000000000000X0XX
+mem[26] = 1"#;
 
-        assert_eq!(part1(input), 165);
+        assert_eq!(part1(input), 208);
 
     }
 
 }
-
-//Not: 6638226208555
-//Not: 6638226208555
