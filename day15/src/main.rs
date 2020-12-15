@@ -1,5 +1,4 @@
-use std::io;
-use std::io::Write;
+use rpds::HashTrieMap;
 
 fn main() {
     let n = part1(&vec![0,1,5,10,3,12,19]);
@@ -15,32 +14,36 @@ fn part1(input: &Vec<u64>) -> u64 {
 }
 
 fn part2(input: &Vec<u64>) -> u64 {
-	find_nth(input, 30000000)
+	find_nth(input, 30_000_000)
 }
 
 fn find_nth(input: &Vec<u64>, n: usize) -> u64 {
-	let mut working = Vec::with_capacity(n);
+	let mut working = HashTrieMap::new();
+	let mut next_working = HashTrieMap::new();
+	let mut prev = 0;
 
 	for i in 0..n {
 		if i % 10000 == 0{
 			print!("Working on {}\r", i);
-			io::stdout().flush();
-
 		}
-		working.insert(i, match input.get(i) {
+		let value = match input.get(i) {
 			Some(n) => *n as usize,
 			None => {
-				if let Some((p, _v))  = working[..i-1].iter().enumerate().rev().find(|(_p, v)| *v == &working[i-1]) {
+				if let Some(p) = working.get(&prev) {
 					i - p - 1
 				}
 				else {
 					0
 				}
 			}
-		});
+		};
+		working = next_working;
+		prev = value;
+		//We last saw this value at this index
+		next_working = working.insert(value, i);
 	}
-	println!("\n");
-	*working.last().unwrap() as u64
+	
+	prev as u64
 }
 
 #[cfg(test)]
