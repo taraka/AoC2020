@@ -22,9 +22,7 @@ fn part1(earliest: u64, buses: Vec<u64>) -> u64 {
 
 fn part2(buses: Vec<Option<u64>>, start: u64) -> u64 {
     buses.iter().enumerate().filter_map(|(to, b)| Some(((*b)?, to as u64)))
-        .fold(
-            (start, 1),
-            |(base_timestamp, period), (bus_id, offset)|
+        .fold((start, 1), |(base_timestamp, period), (bus_id, offset)|
                 (0..).find_map(|i| {
                     let timestamp = base_timestamp + i * period;
                     if (timestamp + offset) % bus_id == 0 {
