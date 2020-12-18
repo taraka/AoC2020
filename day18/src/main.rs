@@ -4,25 +4,23 @@ fn main() -> io::Result<()> {
     let mut buffer = String::new();
     io::stdin().read_to_string(&mut buffer)?;
 
-
-    let n = part1(&buffer);
-    println!("Part1: {}", n);
-
-    // let n = part2(&input);
-    // println!("Part2: {}", n);
+    let n = part2(&buffer);
+    println!("Part2: {}", n);
 
     Ok(())
 }
 
-fn part1(input: &str) -> i64 {
+fn part2(input: &str) -> i64 {
 	input.lines().map(|l| parser::eval(l).unwrap()).sum()
 }
 
 peg::parser! {
     grammar parser() for str {
         pub rule eval() -> i64 = precedence!{
+        		a:(@) _ "*" _ b:@ { a * b }
+        		--
                 a:(@) _ "+" _ b:@ { a + b }
-                a:(@) _ "*" _ b:@ { a * b }
+				--                
                 "(" _ e:eval() _ ")" { e }
                 n:number() { n }
         }
