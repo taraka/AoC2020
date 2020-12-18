@@ -39,7 +39,7 @@ mod tests {
 	#[test]
 	fn test_part1() {
 		assert_eq!(parser::eval("3 + 2").unwrap(), 5);
-		assert_eq!(parser::eval("1 + 2 * 3 + 4 * 5 + 6").unwrap(), 71);
+		assert_eq!(parser::eval("((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2").unwrap(), 23340);
 		
 	}
 }
